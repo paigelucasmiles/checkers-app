@@ -76,3 +76,13 @@
   border: 2px solid red;
   border-radius: 25px;
 }
+
+.white-turn-container {
+  display: flex;
+  justify-content: center;
+}
+
+.black-turn-container {
+  display: flex;
+  justify-content: center;
+}

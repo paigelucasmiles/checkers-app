@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
+import BlackTurn from './Components/BlackTurn';
 
 import Board from "./Components/Board"
-import Turn from './Components/Turn';
+import WhiteTurn from './Components/WhiteTurn';
 
 class App extends Component {
 
@@ -23,7 +24,8 @@ class App extends Component {
     turn: "white",
     stage: this.gameStages["click square"],
     white: this.initialWhite,
-    black: this.initialBlack
+    black: this.initialBlack,
+    selectedPawnLocation: ""
   }
 
   updateGameStage = (current) => {
@@ -39,48 +41,97 @@ class App extends Component {
     }
   }
 
-  updateWhite = (current) => {
-    if(current.pawnColor){
-      const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== current.currentLocation)
+  legalWhiteMoves = (current) => {
+    const currentLocation = this.state.selectedPawnLocation
+    const currentColumn = currentLocation.split("")[0]
+    const currentRow = currentLocation.split("")[1]
+
+    const newColumnCode1 = currentColumn.charCodeAt(0) - 1
+    const newColumnLetter1 = String.fromCharCode(newColumnCode1)
+
+    const newColumnCode2 = currentColumn.charCodeAt(0) + 1
+    const newColumnLetter2 = String.fromCharCode(newColumnCode2)
+
+    const newRow = parseInt(currentRow) + 1
+
+    const legalOption1 = newColumnLetter1.concat(newRow)
+    const legalOption2 = newColumnLetter2.concat(newRow)
+
+    const legalCoordinates = [legalOption1, legalOption2]
+
+    const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
+
+    if(nextMove){
+      const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
-        white: newWhiteArray
-      })
-    } if(current.coordinates){
-      const newerWhiteArray = [...this.state.white, current.coordinates]
-      this.setState({
-        white: newerWhiteArray,
-        stage: this.gameStages[current.gameStage],
+        white: [...newWhiteArray, current.coordinates],
         turn: "black"
       })
     }
   }
 
-  updateBlack = (current) => {
-    if(current.pawnColor){
-      const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== current.currentLocation)
+  legalBlackMoves = (current) => {
+    const currentLocation = this.state.selectedPawnLocation
+    const currentColumn = currentLocation.split("")[0]
+    const currentRow = currentLocation.split("")[1]
+
+    let newColumnCode1 = currentColumn.charCodeAt(0) + 1
+    let newColumnLetter1 = String.fromCharCode(newColumnCode1)
+
+    let newColumnCode2 = currentColumn.charCodeAt(0) - 1
+    let newColumnLetter2 = String.fromCharCode(newColumnCode2)
+
+    let newRow = parseInt(currentRow) - 1
+
+    const legalOption1 = newColumnLetter1.concat(newRow)
+    const legalOption2 = newColumnLetter2.concat(newRow)
+
+    let legalCoordinates = [legalOption1, legalOption2]
+
+    let nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
+
+    if(nextMove){
+      const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
-        black: newBlackArray
-      })
-    } if(current.coordinates){
-      const newerBlackArray = [...this.state.black, current.coordinates]
-      this.setState({
-        black: newerBlackArray,
-        stage: this.gameStages[current.gameStage],
+        black: [...newBlackArray, current.coordinates],
         turn: "white"
       })
+    }
+  }
+
+  updateWhite = (current) => {
+    if(current.pawnColor){
+      this.setState({
+        selectedPawnLocation: current.currentLocation,
+        stage: this.gameStages[current.gameStage]
+      })
+    } if(current.coordinates){
+      this.legalWhiteMoves(current)
+    }
+  }
+
+  updateBlack = (current) => {
+    if(current.pawnColor){
+      this.setState({
+        selectedPawnLocation: current.currentLocation,
+        stage: this.gameStages[current.gameStage]
+      })
+    } if(current.coordinates){
+      this.legalBlackMoves(current)
     }
   }
 
   render(){
     return (
       <div className="App">
-        <Turn turn={this.state.turn}/>
+        <WhiteTurn turn={this.state.turn} />
         <Board turn={this.state.turn}
           gameStage={this.state.stage}
           updateGameStage={this.updateGameStage}
           white={this.state.white}
           black={this.state.black}
         />
+        <BlackTurn turn={this.state.turn}/>
       </div>
     );
   }

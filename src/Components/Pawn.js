@@ -2,9 +2,16 @@ import { Component } from "react"
 
 class Pawn extends Component {
 
+    state = {
+        clicked: false
+    }
+
     handleClick = (event) => {
         if(this.props.gameStage === "click piece" && this.props.pawnColor === this.props.turn){
             this.props.updateGameStage(this.props)
+            this.setState({
+                clicked: true
+            })
         } else {
             return
         }
@@ -12,7 +19,7 @@ class Pawn extends Component {
 
     render(){
         return(
-            <div className={this.props.pawnColor} onClick={this.handleClick}></div>
+            <div className={this.state.clicked ? "red" : this.props.pawnColor} onClick={this.handleClick}></div>
         )
     }
 }
