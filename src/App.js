@@ -41,7 +41,7 @@ class App extends Component {
     }
   }
 
-  legalWhiteMoves = (current) => {
+  legalWhiteMoves = (current) => { 
     const currentLocation = this.state.selectedPawnLocation
     const currentColumn = currentLocation.split("")[0]
     const currentRow = currentLocation.split("")[1]
@@ -57,45 +57,121 @@ class App extends Component {
     const legalOption1 = newColumnLetter1.concat(newRow)
     const legalOption2 = newColumnLetter2.concat(newRow)
 
-    const legalCoordinates = [legalOption1, legalOption2]
+    let legalCoordinates = [legalOption1, legalOption2]
+    const match = legalCoordinates.find(element => this.state.black.includes(element))
+    console.log(match)
 
     const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
 
-    if(nextMove){
+    const nextWhiteMove = (current) => {
       const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
         white: [...newWhiteArray, current.coordinates],
         turn: "black"
       })
     }
+
+    const jump = (current, match) => {
+      const currentLocation = match
+      const currentColumn = currentLocation.split("")[0]
+      const currentRow = currentLocation.split("")[1]
+
+      const newColumnCode1 = currentColumn.charCodeAt(0) - 1
+      const newColumnLetter1 = String.fromCharCode(newColumnCode1)
+
+      const newColumnCode2 = currentColumn.charCodeAt(0) + 1
+      const newColumnLetter2 = String.fromCharCode(newColumnCode2)
+
+      const newRow = parseInt(currentRow) + 1
+
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+
+      let legalCoordinates = [legalOption1, legalOption2]
+      const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
+      if(nextMove){
+        const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
+        const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== match)
+      this.setState({
+        black: [...newBlackArray],
+        white: [...newWhiteArray, current.coordinates],
+        turn: "white"
+      })
+      }
+    }
+
+    if(match){
+      jump(current, match)
+    }
+    if(nextMove){
+      nextWhiteMove(current)
+    }
   }
 
-  legalBlackMoves = (current) => {
+  legalBlackMoves = (current) => { 
     const currentLocation = this.state.selectedPawnLocation
     const currentColumn = currentLocation.split("")[0]
     const currentRow = currentLocation.split("")[1]
 
-    let newColumnCode1 = currentColumn.charCodeAt(0) + 1
-    let newColumnLetter1 = String.fromCharCode(newColumnCode1)
+    const newColumnCode1 = currentColumn.charCodeAt(0) - 1
+    const newColumnLetter1 = String.fromCharCode(newColumnCode1)
 
-    let newColumnCode2 = currentColumn.charCodeAt(0) - 1
-    let newColumnLetter2 = String.fromCharCode(newColumnCode2)
+    const newColumnCode2 = currentColumn.charCodeAt(0) + 1
+    const newColumnLetter2 = String.fromCharCode(newColumnCode2)
 
-    let newRow = parseInt(currentRow) - 1
+    const newRow = parseInt(currentRow) - 1
 
     const legalOption1 = newColumnLetter1.concat(newRow)
     const legalOption2 = newColumnLetter2.concat(newRow)
 
     let legalCoordinates = [legalOption1, legalOption2]
+    const match = legalCoordinates.find(element => this.state.white.includes(element))
+    console.log(match)
 
-    let nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
+    const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
 
-    if(nextMove){
+    const nextBlackMove = (current) => {
       const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
         black: [...newBlackArray, current.coordinates],
         turn: "white"
       })
+    }
+
+    const jump = (current, match) => {
+      const currentLocation = match
+      const currentColumn = currentLocation.split("")[0]
+      const currentRow = currentLocation.split("")[1]
+
+      const newColumnCode1 = currentColumn.charCodeAt(0) - 1
+      const newColumnLetter1 = String.fromCharCode(newColumnCode1)
+
+      const newColumnCode2 = currentColumn.charCodeAt(0) + 1
+      const newColumnLetter2 = String.fromCharCode(newColumnCode2)
+
+      const newRow = parseInt(currentRow) - 1
+
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+
+      let legalCoordinates = [legalOption1, legalOption2]
+      const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
+      if(nextMove){
+        const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
+        const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== match)
+      this.setState({
+        white: [...newWhiteArray],
+        black: [...newBlackArray, current.coordinates],
+        turn: "white"
+      })
+      }
+    }
+
+    if(match){
+      jump(current, match)
+    }
+    if(nextMove){
+      nextBlackMove(current)
     }
   }
 
