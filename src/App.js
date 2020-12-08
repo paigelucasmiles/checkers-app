@@ -25,7 +25,8 @@ class App extends Component {
     stage: this.gameStages["click square"],
     white: this.initialWhite,
     black: this.initialBlack,
-    selectedPawnLocation: ""
+    selectedPawnLocation: "",
+    legalMoves: []
   }
 
   updateGameStage = (current) => {
@@ -41,7 +42,111 @@ class App extends Component {
     }
   }
 
-  legalWhiteMoves = (current) => { 
+
+  updateWhite = (current) => {
+    if(current.pawnColor){
+      this.showLegalMoves(current)
+    } if(current.coordinates){
+      const pawnColor = "white"
+      this.legalMoves(current, pawnColor)
+    }
+  }
+
+  updateBlack = (current) => {
+    if(current.pawnColor){
+      this.showLegalMoves(current)
+    } if(current.coordinates){
+      const pawnColor = "black"
+      this.legalMoves(current, pawnColor)
+    }
+  }
+
+  showLegalMoves = (current) => {
+    const pawnLocation = current.currentLocation.split("")
+    const currentColumn = pawnLocation[0]
+    const currentRow = pawnLocation[1]
+
+    const newColumnCode1 = currentColumn.charCodeAt(0) - 1
+    const newColumnLetter1 = String.fromCharCode(newColumnCode1)
+
+    const newColumnCode2 = currentColumn.charCodeAt(0) + 1
+    const newColumnLetter2 = String.fromCharCode(newColumnCode2)
+
+    if(current.pawnColor === "white"){
+      const newRow = parseInt(currentRow) + 1
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+      let legalCoordinates = [legalOption1, legalOption2]
+      const opponentToJump = legalCoordinates.filter(element => this.state.black.includes(element))
+      
+      console.log("Before opponents " + legalCoordinates)
+      
+      opponentToJump.forEach((element) => {
+        let opponentColumn = element.split("")[0].charCodeAt(0)
+        let offsetFromCurrent = opponentColumn - currentColumn.charCodeAt(0)
+
+        let jumpedToColumn = currentColumn.charCodeAt(0) + (offsetFromCurrent * 2)
+        let jumpedToRow = parseInt(currentRow) + 2
+        let jumpedToCoord = String.fromCharCode(jumpedToColumn).concat(jumpedToRow)
+
+        // remove from legalCoordinates the spot where the opponent is
+        legalCoordinates = legalCoordinates.filter(otherElement => otherElement !== element)
+
+        // add into legalCoordinates the "jumped to" space
+        legalCoordinates.push(jumpedToCoord)
+      })
+
+      legalCoordinates = legalCoordinates.filter(element => this.state.black.includes(element) === false)
+
+      console.log("After opponents: " + legalCoordinates)
+
+      this.setState({
+        legalMoves: legalCoordinates,
+        selectedPawnLocation: current.currentLocation,
+        stage: this.gameStages[current.gameStage]
+      })
+    } 
+    
+    
+    if(current.pawnColor === "black"){
+      const newRow = parseInt(currentRow) - 1
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+      let legalCoordinates = [legalOption1, legalOption2]
+      const opponentToJump = legalCoordinates.filter(element => this.state.white.includes(element))
+      
+      console.log("Before opponents " + legalCoordinates)
+      
+      opponentToJump.forEach((element) => {
+        let opponentColumn = element.split("")[0].charCodeAt(0)
+        let offsetFromCurrent = opponentColumn - currentColumn.charCodeAt(0)
+
+        let jumpedToColumn = currentColumn.charCodeAt(0) + (offsetFromCurrent * 2)
+        let jumpedToRow = parseInt(currentRow) - 2
+        let jumpedToCoord = String.fromCharCode(jumpedToColumn).concat(jumpedToRow)
+
+        // remove from legalCoordinates the spot where the opponent is
+        legalCoordinates = legalCoordinates.filter(otherElement => otherElement !== element)
+
+        // add into legalCoordinates the "jumped to" space
+        legalCoordinates.push(jumpedToCoord)
+      })
+
+      legalCoordinates = legalCoordinates.filter(element => this.state.white.includes(element) === false)
+
+
+      console.log("After opponents: " + legalCoordinates)
+
+      this.setState({
+        legalMoves: legalCoordinates,
+        selectedPawnLocation: current.currentLocation,
+        stage: this.gameStages[current.gameStage]
+      })
+    }
+  }
+
+
+  legalMoves = (current, pawnColor) => {
     const currentLocation = this.state.selectedPawnLocation
     const currentColumn = currentLocation.split("")[0]
     const currentRow = currentLocation.split("")[1]
@@ -52,162 +157,120 @@ class App extends Component {
     const newColumnCode2 = currentColumn.charCodeAt(0) + 1
     const newColumnLetter2 = String.fromCharCode(newColumnCode2)
 
-    const newRow = parseInt(currentRow) + 1
+    if(pawnColor === "white"){
+      const newRow = parseInt(currentRow) + 1
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+      let legalCoordinates = [legalOption1, legalOption2]
+      const opponentToJump = legalCoordinates.filter(element => this.state.black.includes(element))
+      if(legalCoordinates.includes(current.coordinates)){
+        this.movePawn(current, pawnColor)
+      } if(opponentToJump.includes(legalOption1)) {
+        legalCoordinates = legalCoordinates.filter(element => element !== legalOption1)
+        const jumpColumnCode = legalOption1.split("")[0].charCodeAt(0) - 1
+        const jumpColumn = String.fromCharCode(jumpColumnCode)
+        const jumpRow = parseInt(legalOption1.split("")[1]) + 1
+        const jumpCoordinates = jumpColumn.concat(jumpRow)
+        legalCoordinates = [...legalCoordinates, jumpCoordinates]
+        if(legalCoordinates.includes(current.coordinates)){
+          this.jumpPawn(current, pawnColor, legalOption1)
+          console.log(legalOption1)
+        }
+      } if(opponentToJump.includes(legalOption2)) {
+        legalCoordinates = legalCoordinates.filter(element => element !== legalOption2)
+        const jumpColumnCode = legalOption2.split("")[0].charCodeAt(0) + 1
+        const jumpColumn = String.fromCharCode(jumpColumnCode)
+        const jumpRow = parseInt(legalOption1.split("")[1]) + 1
+        const jumpCoordinates = jumpColumn.concat(jumpRow)
+        legalCoordinates = [...legalCoordinates, jumpCoordinates]
+        if(legalCoordinates.includes(current.coordinates)){
+          this.jumpPawn(current, pawnColor, legalOption2)
+          console.log(legalOption2)
 
-    const legalOption1 = newColumnLetter1.concat(newRow)
-    const legalOption2 = newColumnLetter2.concat(newRow)
+        }
+      }
 
-    let legalCoordinates = [legalOption1, legalOption2]
-    const match = legalCoordinates.find(element => this.state.black.includes(element))
-    console.log(match)
+    } if(pawnColor === "black"){
+      const newRow = parseInt(currentRow) - 1
+      const legalOption1 = newColumnLetter1.concat(newRow)
+      const legalOption2 = newColumnLetter2.concat(newRow)
+      let legalCoordinates = [legalOption1, legalOption2]
+      const opponentToJump = legalCoordinates.filter(element => this.state.white.includes(element))
+      if(legalCoordinates.includes(current.coordinates)){
+        this.movePawn(current, pawnColor)
+      } if(opponentToJump.includes(legalOption1)) {
+        legalCoordinates = legalCoordinates.filter(element => element !== legalOption1)
+        const jumpColumnCode = legalOption1.split("")[0].charCodeAt(0) - 1
+        const jumpColumn = String.fromCharCode(jumpColumnCode)
+        const jumpRow = parseInt(legalOption1.split("")[1]) - 1
+        const jumpCoordinates = jumpColumn.concat(jumpRow)
+        legalCoordinates = [...legalCoordinates, jumpCoordinates]
+        if(legalCoordinates.includes(current.coordinates)){
+          this.jumpPawn(current, pawnColor, legalOption1)
+        }
+      } if(opponentToJump.includes(legalOption2)) {
+        legalCoordinates = legalCoordinates.filter(element => element !== legalOption2)
+        const jumpColumnCode = legalOption2.split("")[0].charCodeAt(0) + 1
+        const jumpColumn = String.fromCharCode(jumpColumnCode)
+        const jumpRow = parseInt(legalOption1.split("")[1]) - 1
+        const jumpCoordinates = jumpColumn.concat(jumpRow)
+        legalCoordinates = [...legalCoordinates, jumpCoordinates]
+        if(legalCoordinates.includes(current.coordinates)){
+          this.jumpPawn(current, pawnColor, legalOption2)
+        }
+      }
+    }
+  }
 
-    const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
-
-    const nextWhiteMove = (current) => {
+  movePawn = (current, pawnColor) => {
+    if(pawnColor === "white"){
       const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
         white: [...newWhiteArray, current.coordinates],
         turn: "black"
       })
-    }
-
-    const jump = (current, match) => {
-      const currentLocation = match
-      const currentColumn = currentLocation.split("")[0]
-      const currentRow = currentLocation.split("")[1]
-
-      const newColumnCode1 = currentColumn.charCodeAt(0) - 1
-      const newColumnLetter1 = String.fromCharCode(newColumnCode1)
-
-      const newColumnCode2 = currentColumn.charCodeAt(0) + 1
-      const newColumnLetter2 = String.fromCharCode(newColumnCode2)
-
-      const newRow = parseInt(currentRow) + 1
-
-      const legalOption1 = newColumnLetter1.concat(newRow)
-      const legalOption2 = newColumnLetter2.concat(newRow)
-
-      let legalCoordinates = [legalOption1, legalOption2]
-      const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
-      if(nextMove){
-        const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
-        const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== match)
-      this.setState({
-        black: [...newBlackArray],
-        white: [...newWhiteArray, current.coordinates],
-        turn: "white"
-      })
-      }
-    }
-
-    if(match){
-      jump(current, match)
-    }
-    if(nextMove){
-      nextWhiteMove(current)
-    }
-  }
-
-  legalBlackMoves = (current) => { 
-    const currentLocation = this.state.selectedPawnLocation
-    const currentColumn = currentLocation.split("")[0]
-    const currentRow = currentLocation.split("")[1]
-
-    const newColumnCode1 = currentColumn.charCodeAt(0) - 1
-    const newColumnLetter1 = String.fromCharCode(newColumnCode1)
-
-    const newColumnCode2 = currentColumn.charCodeAt(0) + 1
-    const newColumnLetter2 = String.fromCharCode(newColumnCode2)
-
-    const newRow = parseInt(currentRow) - 1
-
-    const legalOption1 = newColumnLetter1.concat(newRow)
-    const legalOption2 = newColumnLetter2.concat(newRow)
-
-    let legalCoordinates = [legalOption1, legalOption2]
-    const match = legalCoordinates.find(element => this.state.white.includes(element))
-    console.log(match)
-
-    const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
-
-    const nextBlackMove = (current) => {
+    } if(pawnColor === "black"){
       const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
       this.setState({
         black: [...newBlackArray, current.coordinates],
         turn: "white"
       })
     }
+  }
 
-    const jump = (current, match) => {
-      const currentLocation = match
-      const currentColumn = currentLocation.split("")[0]
-      const currentRow = currentLocation.split("")[1]
-
-      const newColumnCode1 = currentColumn.charCodeAt(0) - 1
-      const newColumnLetter1 = String.fromCharCode(newColumnCode1)
-
-      const newColumnCode2 = currentColumn.charCodeAt(0) + 1
-      const newColumnLetter2 = String.fromCharCode(newColumnCode2)
-
-      const newRow = parseInt(currentRow) - 1
-
-      const legalOption1 = newColumnLetter1.concat(newRow)
-      const legalOption2 = newColumnLetter2.concat(newRow)
-
-      let legalCoordinates = [legalOption1, legalOption2]
-      const nextMove = legalCoordinates.find(coordinate => coordinate === current.coordinates)
-      if(nextMove){
-        const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
-        const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== match)
+  jumpPawn = (current, pawnColor, opponentToJump) => {
+    if(pawnColor === "white"){
+      const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
+      const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== opponentToJump)
       this.setState({
-        white: [...newWhiteArray],
+        black: [...newBlackArray],
+        white: [...newWhiteArray, current.coordinates],
+        turn: "black"
+      })
+    } if(pawnColor === "black"){
+      const newBlackArray = this.state.black.filter(currentPosition => currentPosition !== this.state.selectedPawnLocation)
+      const newWhiteArray = this.state.white.filter(currentPosition => currentPosition !== opponentToJump)
+      this.setState({
         black: [...newBlackArray, current.coordinates],
+        white: [...newWhiteArray],
         turn: "white"
       })
-      }
-    }
-
-    if(match){
-      jump(current, match)
-    }
-    if(nextMove){
-      nextBlackMove(current)
     }
   }
 
-  updateWhite = (current) => {
-    if(current.pawnColor){
-      this.setState({
-        selectedPawnLocation: current.currentLocation,
-        stage: this.gameStages[current.gameStage]
-      })
-    } if(current.coordinates){
-      this.legalWhiteMoves(current)
-    }
-  }
-
-  updateBlack = (current) => {
-    if(current.pawnColor){
-      this.setState({
-        selectedPawnLocation: current.currentLocation,
-        stage: this.gameStages[current.gameStage]
-      })
-    } if(current.coordinates){
-      this.legalBlackMoves(current)
-    }
-  }
 
   render(){
     return (
       <div className="App">
         <WhiteTurn turn={this.state.turn} />
+        <BlackTurn turn={this.state.turn}/>
         <Board turn={this.state.turn}
           gameStage={this.state.stage}
           updateGameStage={this.updateGameStage}
           white={this.state.white}
           black={this.state.black}
+          legalMoves={this.state.legalMoves}
         />
-        <BlackTurn turn={this.state.turn}/>
       </div>
     );
   }

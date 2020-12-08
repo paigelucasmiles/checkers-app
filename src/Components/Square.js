@@ -3,6 +3,10 @@ import Pawn from './Pawn'
 
 class Square extends Component {
 
+    state = {
+        isMoveOption: true
+    }
+    
     renderRedPawns = () => {
         if(this.props.occupied === "white"){
             return <Pawn pawnColor="white" 
@@ -31,9 +35,18 @@ class Square extends Component {
         }
     }
 
+    getClassName = (isHighlighted) => {
+        if(isHighlighted){
+            return("blue")
+        } else {
+            return(this.props.color)
+        }
+    }
+    
     render(){
+        const isHighlighted = this.props.legalMoves.includes(this.props.coordinates)
         return(
-            <div className={this.props.color} onClick={this.handleClick}>
+            <div className={this.getClassName(isHighlighted)} onClick={this.handleClick}>
                 {this.renderRedPawns()}
             </div>
         )

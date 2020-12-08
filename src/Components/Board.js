@@ -1,7 +1,7 @@
 import React from 'react';
 import Square from '../Components/Square'
 
-function Board ({turn, gameStage, updateGameStage, white, black, movePawn}) {
+function Board ({turn, gameStage, updateGameStage, white, black, legalMoves}) {
 
     const renderPawns = (key) => {
         if(white.find(player => player === key)){
@@ -12,7 +12,7 @@ function Board ({turn, gameStage, updateGameStage, white, black, movePawn}) {
             }
         }
     }
-    
+
     const renderSquares = () => {
         let gameSpaces = new Array(8)
 
@@ -52,6 +52,7 @@ function Board ({turn, gameStage, updateGameStage, white, black, movePawn}) {
                     gameStage={gameStage}
                     updateGameStage={updateGameStage}
                     turn={turn}
+                    legalMoves={legalMoves}
                 />
             }
         }

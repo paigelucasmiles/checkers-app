@@ -12,8 +12,10 @@ class Pawn extends Component {
             this.setState({
                 clicked: true
             })
-        } else {
-            return
+        } if(this.props.gameStage === "click square"){
+            this.setState({
+                clicked: false
+            })
         }
     }
 

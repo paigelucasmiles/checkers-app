@@ -26,9 +26,33 @@
   width: 70px;
 }
 
+.pink {
+  background-color: pink;
+  border: 1px solid #999;
+  float: left;
+  height: 70px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 70px;
+}
+
 .beige {
   background-color: burlywood;
   border: 1px solid #999;
+  float: left;
+  height: 70px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 70px;
+}
+
+.blue {
+  background-color: rgb(154, 192, 224);
+  border: 1px solid rgb(154, 192, 224);
   float: left;
   height: 70px;
   margin-right: -1px;
@@ -79,10 +103,13 @@
 
 .white-turn-container {
   display: flex;
-  justify-content: center;
+  align-content: flex-start;
+  height: 20px;
 }
 
 .black-turn-container {
   display: flex;
-  justify-content: center;
+  align-content: flex-end;
+  justify-content: flex-end;
+  height: 20px;
 }
