@@ -2,10 +2,10 @@
   justify-content: center;
 }
 
-.turn {
+/* .turn {
   display: flex;
   justify-content: center;
-}
+} */
 
 .board-container {
   margin: auto;
@@ -104,6 +104,7 @@
 .white-turn-container {
   display: flex;
   align-content: flex-start;
+  margin-left: 100px;
   height: 20px;
 }
 
@@ -111,5 +112,6 @@
   display: flex;
   align-content: flex-end;
   justify-content: flex-end;
+  margin-right: 100px;
   height: 20px;
 }
