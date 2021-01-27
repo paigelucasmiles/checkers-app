@@ -1,5 +1,5 @@
 import React from 'react';
-import Square from '../Components/Square'
+import Square from './Square'
 
 function Board ({turn, gameStage, updateGameStage, white, black, legalMoves}) {
 
