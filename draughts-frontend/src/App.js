@@ -4,6 +4,7 @@ import BlackTurn from './Components/BlackTurn';
 
 import Board from "./Components/Board"
 import WhiteTurn from './Components/WhiteTurn';
+import SignupForm from './Components/SignupForm'
 
 class App extends Component {
 
@@ -28,6 +29,8 @@ class App extends Component {
     selectedPawnLocation: "",
     legalMoves: []
   }
+
+
 
   updateGameStage = (current) => {
     const nextStage = this.gameStages[current.gameStage]
